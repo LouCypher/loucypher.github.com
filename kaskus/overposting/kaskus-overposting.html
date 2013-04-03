@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ID" >
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+  <title>Ooops! Kaskus is Overposting – KASKUS, The Largest Indonesian Community</title>
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <style type="text/css">
+    * {
+      margin:0;
+      padding:0;
+      font:11px/1.5 Helvetica, Arial, Sans-serif;
+      font-weight:200;
+    }
+    
+    html {
+      background:#f0f0f0;
+    }
+  
+    body {
+      
+      width:960px;
+      margin:0 auto;
+    }
+    
+    a {
+      color:#0B94ED;
+      text-decoration:none;
+    }
+    
+    a:hover,a:focus {
+      text-decoration:underline;
+    }
+    
+    h1 {
+      text-align:center;
+      
+    }
+    
+    h1 img {
+      width:180px;
+      
+    }
+    
+    h1 a {
+      display:block;
+      width:180px;
+      position:absolute;
+      top:60px;
+      left:50%;
+      margin-left:-90px;
+    }
+    
+    .wrap {
+      width:960px;
+      height:635px;
+      margin:0 auto;
+      background:url(op1.png) no-repeat;
+      position:relative;
+      overflow:hidden;
+    }
+    
+    .wrap p {
+      text-indent:-99999999px;
+    }
+    
+    .op1 {
+      background-position:top center;
+    }
+    
+    .op2 {
+      background-position:bottom center;
+    }
+    
+    .op3 {
+      background:url(op2.png) center center no-repeat;
+    }
+    
+    .op3 h1 {
+      visibility:hidden;
+    }
+    
+    footer {
+      display:block;
+      width:600px;
+      margin:0 auto;
+      color:#999;
+      text-align:center;
+    }
+    
+    footer b {
+      display:block;
+    }
+    #cycler {
+      color: #999;
+      background: transparent;
+      font-size: large;
+      font-weight: bold;
+      text-decoration: none;
+      position: fixed;
+      top: 10px;
+      right: 20px;
+      z-index: 65535;
+      display: block;
+      padding: 0;
+      margin: 0;
+      outline-color: transparent;
+    }
+  </style>
+  <script type="text/javascript">
+    function cycle() {
+      var wrapper = document.querySelector("[class*='wrap op']");
+      var idx = parseInt(wrapper.className.match(/\d$/));
+      var classList = wrapper.classList;
+      if (classList.contains("op" + idx)) {
+        classList.remove("op" + idx);
+        classList.add("op" + (idx < 3 ? idx + 1 : 1));
+      }
+    }
+  </script>
+</head>
+<body>
+  <a id="cycler" title="Cycle between styles" href="" onclick="cycle(); return false;">&#x2630;</a>
+  <div class="wrap op1">
+    <h1>
+      <a href="http://www.kaskus.co.id/"><img src="logo-beta.png" alt="KASKUS, The Largest Indonesian Community" /></a>
+    </h1>
+    <p>KASKUS is Overposting, please wait a moment &amp; try again.</p>
+      </div>
+  
+  <footer>
+    <small>
+      <b>Copyright © 1999 - 2013 Kaskus Networks All Right Reserved</b></small>
+      <div>
+        <a href="http://www.kaskus.co.id/">kaskus.co.id</a> &nbsp;|&nbsp; <a href="http://m.kaskus.co.id">m.kaskus.co.id</a>
+      </div>
+  </footer>
+</body>
