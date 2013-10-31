@@ -27,14 +27,25 @@
       fieldset {
         background: #fff;
         color: #000;
-        border-radius: 10px;
         margin: 5em auto;
-        text-align: center;
-        line-height: 1.5em;
-        padding: 1em 0;
+        padding: 1em;
+        border-radius: 10px;
         max-width: 768px;
         min-width: 600px;
       }
+      fieldset, #preview {
+        text-align: center;
+        line-height: 1.5em;
+        border: 1px solid #000;
+      }
+      #preview {
+        -moz-user-select: none;
+        cursor: default;
+        font-size: x-large;
+        margin: 0 auto 1em;
+        padding: 1em;
+      }
+      #dummy { color: transparent }
       input[class^="color"] { border: 1px solid #aaa }
       input[class^="color"]:focus { box-shadow: 0 0 3px #f00 }
       button, label[for] { cursor: pointer }
@@ -53,6 +64,7 @@
         footer: "http://loucypher.github.io/personas/images/dummy.gif",
         footerURL: "http://loucypher.github.io/personas/images/dummy.gif",
         detailURL: "http://loucypher.github.io/personas/",
+        homepageURL: "http://loucypher.github.io/personas/",
         iconURL: "http://loucypher.github.io/personas/images/icon.png",
         previewURL: "http://loucypher.github.io/personas/images/preview.jpg"
       };
@@ -61,61 +73,125 @@
       const PREVIEW = "PreviewBrowserTheme";
       const RESET_PREVIEW = "ResetBrowserThemePreview";
 
-      function $(id) document.getElementById(id);
-      function getColor(id) $(id).value;
+      function $(aID) document.getElementById(aID);
+      function getColor(aID) $(aID).value;
+      function setColor(aID, aValue) {
+        $(aID).value = aValue;
+      }
 
-      function setTheme(node, action) {
+      // Install theme
+      function setTheme(aNode, aAction) {
         var accentcolor = getColor("accentcolor");
-        theme.id = "solid-color-" + accentcolor + "@loucypher";
-        theme.name = "Solid Color: " + accentcolor;
+        var textcolor = getColor("textcolor");
+        if (!validateColor(accentcolor)) {
+          alert("Invalid color: " + accentcolor);
+          $("accentcolor").focus();
+          return;
+        }
+        if (!validateColor(textcolor)) {
+          alert("Invalid color: " + textcolor);
+          $("textcolor").focus();
+          return;
+        }
+        theme.id = "solid-color-" + accentcolor + "-" + textcolor + "@loucypher";
+        theme.name = "Solid Color: " + accentcolor + "/" + textcolor;
         theme.accentcolor = accentcolor;
-        theme.textcolor = getColor("textcolor");
-        localStorage.setItem("theme", JSON.stringify(theme));
+        theme.textcolor = textcolor;
         try {
-          node.setAttribute("data-browsertheme", JSON.stringify(theme));
+          aNode.setAttribute("data-browsertheme", JSON.stringify(theme));
           var event = document.createEvent("Events");
-          event.initEvent(action, true, false);
-          node.dispatchEvent(event);
+          event.initEvent(aAction, true, false);
+          aNode.dispatchEvent(event);
         } catch(ex) {
           alert(ex);
         }
       }
 
-      function getTheme() {
-        if (localStorage.getItem("theme")) {
-          theme = JSON.parse(localStorage.getItem("theme"));
-          //$("accentcolor").setAttribute("value", theme.accentcolor);
-          //$("textcolor").setAttribute("value", theme.textcolor);
-          $("accentcolor").value = theme.accentcolor;
-          $("textcolor").value = theme.textcolor;
+      function preview() {
+        $("preview").style.backgroundColor = getColor("accentcolor");
+        $("preview").style.color = getColor("textcolor");
+        $("preview").style.borderColor = getColor("textcolor");
+      }
+
+      // Save color values to localStorage
+      function saveColors() {
+        try {
+          var colors = {
+            accent: getColor("accentcolor"),
+            text: getColor("textcolor")
+          }
+          localStorage.setItem("colors", JSON.stringify(colors));
+        } catch(ex) {
+          console.log(ex);
         }
-        else {
-          $("accentcolor").value = "#FFFFFF";
-          $("textcolor").value = "#000000";
+      }
+
+      // Check validity of color value
+      function validateColor(aColor) {
+        // Set dummy element color
+        $("dummy").style.color = (aColor == "") ? "#222" : aColor;
+        var valid;
+        var computedColor = getComputedStyle($("dummy"), null).color;
+
+        if (computedColor == "transparent")
+          // If dummy element's color is not set because invalid color value
+          valid = false;
+        else
+          valid = true;
+        $("dummy").style.color = ""; // Reset dummy element's color
+        return valid;
+      }
+
+      function onLoad() {
+        try {
+          if (localStorage.getItem("theme")) {  // Get old storage from previous version
+            theme = JSON.parse(localStorage.getItem("theme"));
+            setColor("accentcolor", theme.accentcolor);
+            setColor("textcolor", theme.textcolor);
+            localStorage.removeItem("theme");   // Remove old storage
+          }
+          else if (localStorage.getItem("colors")) {
+            var colors = JSON.parse(localStorage.getItem("colors"));
+            setColor("accentcolor", colors.accent);
+            setColor("textcolor", colors.text);
+          }
+          else {
+            setColor("accentcolor", "#FFFFFF");
+            setColor("textcolor", "#000000");
+          }
+        } catch(ex) {
+          console.log(ex);
         }
+        preview();
       }
     </script>
   </head>
 
-  <body onload="getTheme();">
+  <body onload="onLoad();">
     <fieldset>
-      <label for="accentcolor">Background color</label>
-      <input id="accentcolor" name="accentcolor" placeholder="Color value"
-             class="color { hash: true, adjust: false, required: true,
-                            pickerFaceColor: 'threedface',
-                            pickerBorderColor: 'threedshadow' }"/>
+      <div id="preview">Solid Color Theme</div>
+      <div id="form">
+        <label for="accentcolor">Background color</label>
+        <input id="accentcolor" name="accentcolor" placeholder="Color value"
+               onchange="preview(); saveColors();" oninput="preview(); saveColors();"
+               class="color { hash: true, adjust: false, required: true,
+                              pickerFaceColor: 'threedface',
+                              pickerBorderColor: 'threedshadow' }"/>
 
-      <label for="textcolor">Text color</label>
-      <input id="textcolor" name="textcolor" placeholder="Color value"
-             class="color { hash: true, adjust: false, required: true,
-                            pickerFaceColor: 'threedface',
-                            pickerBorderColor: 'threedshadow' }"/>
+        <label for="textcolor">Text color</label>
+        <input id="textcolor" name="textcolor" placeholder="Color value"
+               onchange="preview(); saveColors();" oninput="preview(); saveColors();"
+               class="color { hash: true, adjust: false, required: true,
+                              pickerFaceColor: 'threedface',
+                              pickerBorderColor: 'threedshadow' }"/>
 
-      <button onclick="setTheme(this, INSTALL);">Install Theme</button>
-      <!--<button onclick="setTheme(this, INSTALL);"
-              onmouseover="setTheme(this, PREVIEW);"
-              onmouseout="setTheme(this, RESET_PREVIEW);">Install Theme</button>-->
+        <button onclick="setTheme(this, INSTALL);">Install Theme</button>
+        <!--<button onclick="setTheme(this, INSTALL);"
+                onmouseover="setTheme(this, PREVIEW);"
+                onmouseout="setTheme(this, RESET_PREVIEW);">Install Theme</button>-->
+      </div>
     </fieldset>
     <script type="text/javascript" src="jscolor/jscolor.js"></script>
+    <div id="dummy"></div>
   </body>
 </html>
