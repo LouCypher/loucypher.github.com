@@ -24,16 +24,16 @@
 
     <style type="text/css">
       body { background: buttonface; color: buttontext }
-      fieldset {
+      fieldset, noscript { margin: 5em auto 1em }
+      fieldset, #how-to, noscript {
         background: #fff;
         color: #000;
-        margin: 5em auto;
         padding: 1em;
         border-radius: 10px;
         max-width: 768px;
         min-width: 600px;
       }
-      fieldset, #preview {
+      fieldset, #preview, #how-to, noscript {
         text-align: center;
         line-height: 1.5em;
         border: 1px solid #000;
@@ -41,14 +41,23 @@
       #preview {
         -moz-user-select: none;
         cursor: default;
-        font-size: x-large;
         margin: 0 auto 1em;
         padding: 1em;
       }
+      #preview h1 { font-size: x-large }
+      #how-to {
+        visibility: hidden;
+        position: relative;
+        margin: -12em auto;
+      }
+      #how-to:target { visibility: visible }
+      .help { float:right; font-size:small }
       #dummy { color: transparent }
       input[class^="color"] { border: 1px solid #aaa }
       input[class^="color"]:focus { box-shadow: 0 0 3px #f00 }
       button, label[for] { cursor: pointer }
+      .clear { clear: both }
+      .hidden { display: none }
     </style>
 
     <script type="text/javascript">
@@ -80,28 +89,30 @@
       }
 
       // Install theme
-      function setTheme(aNode, aAction) {
+      function setTheme(aAction) {
         var accentcolor = getColor("accentcolor");
         var textcolor = getColor("textcolor");
-        if (!validateColor(accentcolor)) {
-          alert("Invalid color: " + accentcolor);
-          $("accentcolor").focus();
-          return;
-        }
-        if (!validateColor(textcolor)) {
-          alert("Invalid color: " + textcolor);
-          $("textcolor").focus();
-          return;
+        if (aAction == INSTALL) {
+          if (!validateColor(accentcolor)) {
+            alert("Invalid color: " + accentcolor);
+            $("accentcolor").focus();
+            return;
+          }
+          if (!validateColor(textcolor)) {
+            alert("Invalid color: " + textcolor);
+            $("textcolor").focus();
+            return;
+          }
         }
         theme.id = "solid-color-" + accentcolor + "-" + textcolor + "@loucypher";
         theme.name = "Solid Color: " + accentcolor + "/" + textcolor;
         theme.accentcolor = accentcolor;
         theme.textcolor = textcolor;
         try {
-          aNode.setAttribute("data-browsertheme", JSON.stringify(theme));
+          $("preview").setAttribute("data-browsertheme", JSON.stringify(theme));
           var event = document.createEvent("Events");
           event.initEvent(aAction, true, false);
-          aNode.dispatchEvent(event);
+          $("preview").dispatchEvent(event);
         } catch(ex) {
           alert(ex);
         }
@@ -111,6 +122,7 @@
         $("preview").style.backgroundColor = getColor("accentcolor");
         $("preview").style.color = getColor("textcolor");
         $("preview").style.borderColor = getColor("textcolor");
+        setTheme(PREVIEW);
       }
 
       // Save color values to localStorage
@@ -143,6 +155,7 @@
       }
 
       function onLoad() {
+        $("wrapper").classList.remove("hidden");
         try {
           if (localStorage.getItem("theme")) {  // Get old storage from previous version
             theme = JSON.parse(localStorage.getItem("theme"));
@@ -163,36 +176,55 @@
           console.log(ex);
         }
         preview();
+        window.addEventListener("focus", preview, false);
+        $("how-to").innerHTML = $("how-to").innerHTML.replace(/\%HOSTNAME\%/, location.hostname);
+      }
+
+      function onUnload() {
+        window.removeEventListener("focus", preview, false);
+      }
+
+      function howTo() {
       }
     </script>
   </head>
 
-  <body onload="onLoad();">
-    <fieldset>
-      <div id="preview"
-           onmouseover="setTheme(this, PREVIEW);"
-           onmouseout="setTheme(this, RESET_PREVIEW);">Solid Color Theme</div>
-      <div id="form">
-        <label for="accentcolor">Background color</label>
-        <input id="accentcolor" name="accentcolor" placeholder="Color value"
-               onchange="preview(); saveColors();" oninput="preview(); saveColors();"
-               class="color { hash: true, adjust: false, required: true,
-                              pickerFaceColor: 'threedface',
-                              pickerBorderColor: 'threedshadow' }"/>
+  <body onload="onLoad(); howTo();" onunload="onUnload();">
+    <noscript>JavaScript must be enabled to run this tool.</noscript>
+    <div id="wrapper" class="hidden">
+      <fieldset>
+        <div id="preview" onmouseover="setTheme(PREVIEW);"><h1>Solid Color Theme</h1></div>
+        <div class="help"><a href="#how-to">Help</a></div>
+        <div id="form">
+          <label for="accentcolor">Background color</label>
+          <input id="accentcolor" name="accentcolor" placeholder="Color value"
+                 onchange="saveColors(); preview();" oninput="saveColors(); preview();"
+                 class="color { hash: true, adjust: false, required: true,
+                                pickerFaceColor: 'threedface',
+                                pickerBorderColor: 'threedshadow' }"/>
 
-        <label for="textcolor">Text color</label>
-        <input id="textcolor" name="textcolor" placeholder="Color value"
-               onchange="preview(); saveColors();" oninput="preview(); saveColors();"
-               class="color { hash: true, adjust: false, required: true,
-                              pickerFaceColor: 'threedface',
-                              pickerBorderColor: 'threedshadow' }"/>
+          <label for="textcolor">Text color</label>
+          <input id="textcolor" name="textcolor" placeholder="Color value"
+                 onchange="saveColors(); preview();" oninput="saveColors(); preview();"
+                 class="color { hash: true, adjust: false, required: true,
+                                pickerFaceColor: 'threedface',
+                                pickerBorderColor: 'threedshadow' }"/>
 
-        <button onclick="setTheme(this, INSTALL);"
-                onmouseover="setTheme(this, PREVIEW);"
-                onmouseout="setTheme(this, RESET_PREVIEW);">Install Theme</button>
+          <button onclick="setTheme(INSTALL);">Install Theme</button>
+        </div>
+      </fieldset>
+      <script type="text/javascript" src="jscolor/jscolor.js"></script>
+      <div id="dummy"></div>
+      <div id="how-to">
+        <h2>How to make preview work</h2>
+        <ol>
+          <li>Open Firefox Options > Security.</li>
+          <li>Click 'Exception button'.</li>
+          <li>Enter '%HOSTNAME%' and click 'Allow'.</li>
+        </ol>
+        <div class="help">&larr; <a href="#" onclick="history.back(); return false">Return</a></div>
+        <div class="clear"></div>
       </div>
-    </fieldset>
-    <script type="text/javascript" src="jscolor/jscolor.js"></script>
-    <div id="dummy"></div>
+    </div>
   </body>
 </html>
