@@ -117,26 +117,6 @@
         }
       }
 
-      function preview() {
-        $("preview").style.backgroundColor = getColor("accentcolor");
-        $("preview").style.color = getColor("textcolor");
-        $("preview").style.borderColor = getColor("textcolor");
-        setTheme(PREVIEW);
-      }
-
-      // Save color values to localStorage
-      function saveColors() {
-        try {
-          var colors = {
-            accent: getColor("accentcolor"),
-            text: getColor("textcolor")
-          }
-          localStorage.setItem("colors", JSON.stringify(colors));
-        } catch(ex) {
-          console.log(ex);
-        }
-      }
-
       // Check validity of color value
       function validateColor(aColor) {
         // Set dummy element color
@@ -151,6 +131,13 @@
           valid = true;
         $("dummy").style.color = ""; // Reset dummy element's color
         return valid;
+      }
+
+      function preview() {
+        $("preview").style.backgroundColor = getColor("accentcolor");
+        $("preview").style.color = getColor("textcolor");
+        $("preview").style.borderColor = getColor("textcolor");
+        setTheme(PREVIEW);
       }
 
       function onLoad() {
@@ -180,6 +167,17 @@
       }
 
       function onUnload() {
+        try {
+          var colors = {
+            accent: getColor("accentcolor"),
+            text: getColor("textcolor")
+          }
+          // Save color values to localStorage
+          localStorage.setItem("colors", JSON.stringify(colors));
+        } catch(ex) {
+          console.log(ex);
+        }
+
         window.removeEventListener("focus", preview, false);
       }
 
@@ -201,14 +199,14 @@
         <div id="form">
           <label for="accentcolor">Background color</label>
           <input id="accentcolor" name="accentcolor" placeholder="Color value"
-                 onchange="saveColors(); preview();" oninput="saveColors(); preview();"
+                 onchange="preview();" oninput="preview();"
                  class="color { hash: true, adjust: false, required: true,
                                 pickerFaceColor: 'threedface',
                                 pickerBorderColor: 'threedshadow' }"/>
 
           <label for="textcolor">Text color</label>
           <input id="textcolor" name="textcolor" placeholder="Color value"
-                 onchange="saveColors(); preview();" oninput="saveColors(); preview();"
+                 onchange="preview();" oninput="preview();"
                  class="color { hash: true, adjust: false, required: true,
                                 pickerFaceColor: 'threedface',
                                 pickerBorderColor: 'threedshadow' }"/>
@@ -219,12 +217,18 @@
       <script type="text/javascript" src="jscolor/jscolor.js"></script>
       <div id="dummy"></div>
       <div id="how-to" class="hidden">
-        <h2>How to make preview work</h2>
+        <h2>Auto-preview in Firefox</h2>
+        <p>To make auto-preview in Firefox work, follow these steps</p>
         <ol>
           <li>Open Firefox Options > Security.</li>
           <li>Click 'Exception button'.</li>
-          <li>Enter '%HOSTNAME%' and click 'Allow'.</li>
+          <li>Enter '%HOSTNAME%'.</li>
         </ol>
+        <p>
+          If you don't want to add this site to exception list,
+          <br/>
+          you can still preview the colors from preview box.
+        </p>
         <div class="help">&larr; <a href="#" onclick="howTo(); return false">Return</a></div>
         <div class="clear"></div>
       </div>
