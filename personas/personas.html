@@ -169,7 +169,9 @@
 
   <body onload="onLoad();">
     <fieldset>
-      <div id="preview">Solid Color Theme</div>
+      <div id="preview"
+           onmouseover="setTheme(this, PREVIEW);"
+           onmouseout="setTheme(this, RESET_PREVIEW);">Solid Color Theme</div>
       <div id="form">
         <label for="accentcolor">Background color</label>
         <input id="accentcolor" name="accentcolor" placeholder="Color value"
