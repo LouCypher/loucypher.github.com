@@ -46,11 +46,10 @@
       }
       #preview h1 { font-size: x-large }
       #how-to {
-        visibility: hidden;
         position: relative;
         margin: -12em auto;
       }
-      #how-to:target { visibility: visible }
+      #how-to:target { display: block }
       .help { float:right; font-size:small }
       #dummy { color: transparent }
       input[class^="color"] { border: 1px solid #aaa }
@@ -185,16 +184,20 @@
       }
 
       function howTo() {
+        if (location.hash == "#how-to")
+          location.hash = "";
+        else
+          $("how-to").classList.toggle("hidden");
       }
     </script>
   </head>
 
-  <body onload="onLoad(); howTo();" onunload="onUnload();">
+  <body onload="onLoad();" onunload="onUnload();">
     <noscript>JavaScript must be enabled to run this tool.</noscript>
     <div id="wrapper" class="hidden">
       <fieldset>
         <div id="preview" onmouseover="setTheme(PREVIEW);"><h1>Solid Color Theme</h1></div>
-        <div class="help"><a href="#how-to">Help</a></div>
+        <div class="help"><a href="#how-to" onclick="howTo(); return false">Help</a></div>
         <div id="form">
           <label for="accentcolor">Background color</label>
           <input id="accentcolor" name="accentcolor" placeholder="Color value"
@@ -215,14 +218,14 @@
       </fieldset>
       <script type="text/javascript" src="jscolor/jscolor.js"></script>
       <div id="dummy"></div>
-      <div id="how-to">
+      <div id="how-to" class="hidden">
         <h2>How to make preview work</h2>
         <ol>
           <li>Open Firefox Options > Security.</li>
           <li>Click 'Exception button'.</li>
           <li>Enter '%HOSTNAME%' and click 'Allow'.</li>
         </ol>
-        <div class="help">&larr; <a href="#" onclick="history.back(); return false">Return</a></div>
+        <div class="help">&larr; <a href="#" onclick="howTo(); return false">Return</a></div>
         <div class="clear"></div>
       </div>
     </div>
