@@ -14,7 +14,7 @@ valid=true;$("dummy").style.color="";return valid;}
 function preview(){$("preview").style.backgroundColor=getColor("accentcolor");$("preview").style.color=getColor("textcolor");$("preview").style.borderColor=getColor("textcolor");setTheme(PREVIEW);}
 function onLoad(){$("wrapper").classList.remove("hidden");try{if(localStorage.getItem("theme")){theme=JSON.parse(localStorage.getItem("theme"));setColor("accentcolor",theme.accentcolor);setColor("textcolor",theme.textcolor);localStorage.removeItem("theme");}
 else if(localStorage.getItem("colors")){var colors=JSON.parse(localStorage.getItem("colors"));setColor("accentcolor",colors.accent);setColor("textcolor",colors.text);}
-else{setColor("accentcolor","#FFFFFF");setColor("textcolor","#000000");}}catch(ex){console.log(ex);}
+else{setColor("accentcolor","#0099B9");setColor("textcolor","#FFFFFF");}}catch(ex){console.log(ex);}
 preview();window.addEventListener("focus",preview,false);$("how-to").innerHTML=$("how-to").innerHTML.replace(/\%HOSTNAME\%/,location.hostname);}
 function onUnload(){try{var colors={accent:getColor("accentcolor"),text:getColor("textcolor")}
 localStorage.setItem("colors",JSON.stringify(colors));}catch(ex){console.log(ex);}
