@@ -23,6 +23,7 @@
     <link rel="apple-touch-icon" href="images/appe-touch-icon.png"/>
 
     <style type="text/css">
+      html { font-family: sans-serif }
       body { background: buttonface; color: buttontext }
       fieldset, noscript { margin: 5em auto 1em }
       fieldset, #how-to, noscript {
@@ -57,6 +58,16 @@
       button, label[for] { cursor: pointer }
       .clear { clear: both }
       .hidden { display: none }
+    </style>
+
+    <style id="noscript" type="text/css">
+      #wrapper ~ * { visibility: hidden !important; display: inline !important; }
+      #wrapper ~ div[style*="resource://noscript"]:after {
+        visibility: visible !important;
+        content: url(/images/maone.png);
+        position: absolute;
+        top: 3em;
+      }
     </style>
 
     <script type="text/javascript">
@@ -187,6 +198,8 @@
         else
           $("how-to").classList.toggle("hidden");
       }
+
+      document.head.removeChild($("noscript"));
     </script>
   </head>
 
