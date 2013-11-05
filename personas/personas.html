@@ -8,10 +8,10 @@
   <head>
     <meta charset="utf-8"/>
     <title>Solid Color Theme for Firefox</title>
-    <meta name="description" content="Install solid color theme without graphics on Firefox."/>
+    <meta name="description" content="Install solid color theme without images on Firefox."/>
     <meta name="author" content="https://github.com/LouCypher"/>
     <meta itemprop="name" content="Solid Color Theme for Firefox"/>
-    <meta itemprop="description" content="Install solid color theme without graphics on Firefox."/>
+    <meta itemprop="description" content="Install solid color theme without images on Firefox."/>
     <meta itemprop="author" content="https://github.com/LouCypher"/>
     <meta itemprop="url" content="http://loucypher.github.io/personas/"/>
     <meta itemprop="image" content="http://loucypher.github.io/personas/images/kojiyuu.jpg"/>
@@ -24,9 +24,9 @@
 
     <style type="text/css">
       html { font-family: sans-serif }
-      body { background: buttonface; color: buttontext }
+      body { background: ButtonFace; color: ButtonText }
       fieldset, noscript { margin: 5em auto 1em }
-      fieldset, #how-to, noscript {
+      fieldset, .help, noscript {
         background: #fff;
         color: #000;
         padding: 1em;
@@ -35,7 +35,7 @@
         max-width: 768px;
         min-width: 600px;
       }
-      fieldset, #preview, #how-to, noscript {
+      fieldset, #preview, .help, noscript {
         text-align: center;
         line-height: 1.5em;
         border: 1px solid #000;
@@ -47,13 +47,13 @@
         padding: 1em;
       }
       #preview h1 { font-size: x-large }
-      #how-to {
+      .help {
         position: relative;
         margin: -12em auto;
       }
-      #how-to:target { display: block }
-      #instructions { text-align: left; width: 480px; margin: auto }
-      .help { float:right; font-size:small }
+      .help:target { display: block }
+      .help-text { text-align: left; width: 480px; margin: auto }
+      .link { float:right; font-size:small }
       #dummy { color: transparent }
       input[class^="color"] { border: 1px solid #aaa }
       input[class^="color"]:focus { box-shadow: 0 0 3px #f00 }
@@ -96,9 +96,7 @@
 
       function $(aID) document.getElementById(aID);
       function getColor(aID) $(aID).value;
-      function setColor(aID, aValue) {
-        $(aID).value = aValue;
-      }
+      function setColor(aID, aValue) { $(aID).value = aValue }
 
       // Install theme
       function setTheme(aAction) {
@@ -157,7 +155,8 @@
         setTheme(PREVIEW);
       }
 
-      function onLoad() {
+      function load() {
+        document.querySelector("head").removeChild($("noscript"));
         $("wrapper").classList.remove("hidden");
         try {
           if (localStorage.getItem("theme")) {  // Get old storage from previous version
@@ -182,7 +181,7 @@
         window.addEventListener("focus", preview, false);
       }
 
-      function onUnload() {
+      function unload() {
         try {
           var colors = {
             accent: getColor("accentcolor"),
@@ -193,28 +192,30 @@
         } catch(ex) {
           console.log(ex);
         }
-
         window.removeEventListener("focus", preview, false);
       }
 
-      function howTo() {
-        if (location.hash == "#how-to")
+      function help(aIdentifier) {
+        if (location.hash == "#" + aIdentifier)
           location.hash = "";
         else
-          $("how-to").classList.toggle("hidden");
+          $(aIdentifier).classList.toggle("hidden");
       }
-
-      document.querySelector("head").removeChild($("noscript"));
     </script>
   </head>
 
-  <body onload="onLoad();" onunload="onUnload();">
+  <body onload="load();" onunload="unload();">
     <noscript>JavaScript must be enabled to run this tool.</noscript>
 
     <div id="wrapper" class="hidden">
       <fieldset>
         <div id="preview"><h1>Solid Color Theme</h1></div>
-        <div class="help"><a href="#how-to" onclick="howTo(); return false">Help</a></div>
+        <div class="link">
+          <a href="#about" title="About Solid Color Theme"
+             onclick="help('about'); return false">What?</a>
+          <a href="#how-to" title="How to enable auto-preview in Firefox"
+             onclick="help('how-to'); return false">How?</a>
+        </div>
         <div id="form">
           <label for="accentcolor">Background color</label>
           <input id="accentcolor" name="accentcolor" placeholder="Color value"
@@ -237,30 +238,47 @@
 
       <div id="dummy"></div>
 
-      <div id="how-to" class="hidden">
+      <div id="about" class="help hidden">
+        <h2>About Solid Color Theme</h2>
+        <div class="help-text">
+          <p>
+            This tool lets you install solid color light weight theme (also called
+            <em>personas</em>, or just <em>theme</em>).
+          </p>
+          <p>
+            Unlike <a href="https://addons.mozilla.org/themes/">other themes</a>,
+            this theme is not using images. Just plain colors.
+            You can choose any colors you like.
+          </p>
+        </div><!--/help-text-->
+        <div class="link">&larr; <a href="#" onclick="help('about'); return false">Return</a></div>
+        <div class="clear"></div>
+      </div><!--/about-->
+      
+      <div id="how-to" class="help hidden">
         <h2>Auto-preview in Firefox</h2>
-
-        <div id="instructions">
-          <p>To make auto-preview in Firefox work, follow these steps</p>
+        <div class="help-text">
+          <p>To make auto-preview in Firefox work, you must do the following:</p>
           <ol>
-            <li>Right click on this page and select <strong>View Page Info</strong></li>
-            <li>Click <strong>Permissions</strong> tab</li>
-            <li>Uncheck <strong>Use default</strong> in <strong>Install Add-ons</strong></li>
-            <li>Select <strong>Allow</strong></li>
+            <li>Right click on this page and select <strong>View Page Info</strong>.</li>
+            <li>Click <strong>Permissions</strong> tab.</li>
+            <li>Uncheck <strong>Use default</strong> in <strong>Install Add-ons</strong>.</li>
+            <li>Select <strong>Allow</strong>.</li>
           </ol>
           <p>
-            If you don't want to add this site to exception list,
-            you can still preview the colors from preview box.
+            If you don't want to allow this site, you can still preview the colors from
+            preview box.
           </p>
           <p>
-            For Win XP users: to enable custom colors in title bar,
-            install <a href="http://userstyles.org/styles/94758">this user style</a>.
+            Win XP users: to enable custom colors in title bar, you can install
+            <a href="http://userstyles.org/styles/94758">Enable Personas on Title Bar</a>
+            user style.
           </p>
-        </div><!--instructions-->
-        <div class="help">&larr; <a href="#" onclick="howTo(); return false">Return</a></div>
+        </div><!--/help-text-->
+        <div class="link">&larr; <a href="#" onclick="help('how-to'); return false">Return</a></div>
         <div class="clear"></div>
-      </div><!--how-to-->
+      </div><!--/how-to-->
 
-    </div><!--wrapper-->
+    </div><!--/wrapper-->
   </body>
 </html>
