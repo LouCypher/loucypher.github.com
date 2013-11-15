@@ -54,6 +54,7 @@
         position: relative;
         margin: -15em auto;
       }
+      .help:target { display: block }
       .help:before {
         content: "";
         position: fixed;
@@ -62,7 +63,6 @@
         background: rgba(0, 0, 0, .75);
       }
       #why { margin-top: -10em }
-      .help:target { display: block }
       .help-text { text-align: left; width: 480px; margin: auto }
       .link { float:right; font-size:small }
       #dummy { color: transparent }
@@ -70,7 +70,8 @@
       input[class^="color"]:focus { box-shadow: 0 0 3px #f00 }
       button, label[for] { cursor: pointer }
       .clear { clear: both; margin: 1em 0 0 }
-      .hidden { display: none }
+      .hidden, .in-frame, .frame .no-frame { display: none }
+      .frame .in-frame { display: inline }
     </style>
 
     <style id="noscript" type="text/css">
@@ -135,7 +136,7 @@
           var event = document.createEvent("Events");
           event.initEvent(aAction, true, false);
           $("preview").dispatchEvent(event);
-        } catch(ex) {
+        } catch (ex) {
           alert(ex);
         }
       }
@@ -166,6 +167,9 @@
       function load() {
         document.querySelector("head").removeChild($("noscript"));
         $("wrapper").classList.remove("hidden");
+        if (window.top !== window.self)
+          document.documentElement.classList.add("frame");
+
         try {
           var colors;
           if (localStorage.getItem("colors")) {  // Get old storage from previous version
@@ -183,7 +187,7 @@
             setColor("accentcolor", theme.accentcolor);
             setColor("textcolor", theme.textcolor);
           }
-        } catch(ex) {
+        } catch (ex) {
           console.log(ex);
         }
         preview();
@@ -198,7 +202,7 @@
           }
           // Save color values to localStorage
           localStorage.setItem("lwtheme", JSON.stringify(lwtheme));
-        } catch(ex) {
+        } catch (ex) {
           console.log(ex);
         }
         window.removeEventListener("focus", preview, false);
@@ -272,7 +276,12 @@
         <div class="help-text">
           <p>To make auto-preview in Firefox work, you must do the following:</p>
           <ol>
-            <li>Right click on this page and select <strong>View Page Info</strong>.</li>
+            <li>
+              Right click on this page and select
+                <span class="no-frame"><strong>View Page Info</strong>.</span>
+                <span class="in-frame"><strong>This Frame</strong> &gt;
+                <strong>View Frame Info</strong>.</span>
+            </li>
             <li>Click <strong>Permissions</strong> tab.</li>
             <li>Uncheck <strong>Use default</strong> in <strong>Install Add-ons</strong>.</li>
             <li>Select <strong>Allow</strong>.</li>
