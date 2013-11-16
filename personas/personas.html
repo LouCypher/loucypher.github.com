@@ -74,7 +74,7 @@
       .frame .in-frame { display: inline }
     </style>
 
-    <style id="noscript" type="text/css">
+    <style type="text/css" id="noscript">
       #wrapper ~ * { visibility: hidden !important; display: inline !important; }
       #wrapper ~ div[style*="resource://noscript"]:after {
         visibility: visible !important;
@@ -85,19 +85,21 @@
     </style>
 
     <script type="text/javascript">
+      var themeURL = location.href.replace(location.search, "");
       var theme = {
         id: "solid-color@loucypher",
         name: "Solid Color: #0099B9/#FFFFFF",
+        description: "Use solid color theme without images.",
         author: "LouCypher",
         category: "Solid",
         accentcolor: "#0099B9",
         textcolor: "#FFFFFF",
-        headerURL: "images/dummy.gif",
-        footerURL: "images/dummy.gif",
-        iconURL: "images/icon.png",
-        previewURL: "images/preview.png",
-        homepageURL: "http://loucypher.github.io/personas/",
-        detailURL: "http://loucypher.github.io/personas/"
+        headerURL: "images/dummy.gif",     //-----------------------------------------//
+        footerURL: "images/dummy.gif",     //  The path is relative to the HTML file  //
+        iconURL: "images/icon.png",        //                                         //
+        previewURL: "images/preview.png",  //-----------------------------------------//
+        homepageURL: themeURL,    //  ----------------------
+        detailURL: themeURL       //  Must use absolute path
       };
 
       const INSTALL = "InstallBrowserTheme";
@@ -105,6 +107,7 @@
       const RESET_PREVIEW = "ResetBrowserThemePreview";
 
       function $(aID) document.getElementById(aID);
+      function esc(aString) encodeURIComponent(aString);
       function getColor(aID) $(aID).value;
       function setColor(aID, aValue) { $(aID).value = aValue }
       function toUpperCase(aString) /^\#/.test(aString) ? aString.toUpperCase() : aString;
@@ -113,6 +116,10 @@
       function setTheme(aAction) {
         var accentcolor = getColor("accentcolor");
         var textcolor = getColor("textcolor");
+
+        theme.accentcolor = accentcolor;
+        theme.textcolor = textcolor;
+
         if (aAction == INSTALL) {
           if (!validateColor(accentcolor)) {
             alert("Invalid color: " + accentcolor);
@@ -124,13 +131,13 @@
             $("textcolor").focus();
             return;
           }
+          theme.id = "solid-color-" + accentcolor.toLowerCase() + "-" + textcolor.toLowerCase()
+                   + "@loucypher";
+          theme.name = "Solid Color: " + toUpperCase(accentcolor) + "/" + toUpperCase(textcolor);
+          theme.homepageURL += "?accentcolor=" + esc(accentcolor) + "&textcolor=" + esc(textcolor);
+          theme.detailURL = theme.homepageURL;
         }
 
-        theme.id = "solid-color-" + accentcolor.toLowerCase() + "-" + textcolor.toUpperCase()
-                 + "@loucypher";
-        theme.name = "Solid Color: " + toUpperCase(accentcolor) + "/" + toUpperCase(textcolor);
-        theme.accentcolor = accentcolor;
-        theme.textcolor = textcolor;
         try {
           $("preview").setAttribute("data-browsertheme", JSON.stringify(theme));
           var event = document.createEvent("Events");
@@ -170,40 +177,54 @@
         if (window.top !== window.self)
           document.documentElement.classList.add("frame");
 
-        try {
-          var colors;
-          if (localStorage.getItem("colors")) {  // Get old storage from previous version
-            colors = JSON.parse(localStorage.getItem("colors"));
-            setColor("accentcolor", colors.accent);
-            setColor("textcolor", colors.text);
-            localStorage.removeItem("colors");   // Remove old storage
-          }
-          else if (localStorage.getItem("lwtheme")) {
-            colors = JSON.parse(localStorage.getItem("lwtheme"));
-            setColor("accentcolor", colors.accentcolor);
-            setColor("textcolor", colors.textcolor);
-          }
-          else {
-            setColor("accentcolor", theme.accentcolor);
-            setColor("textcolor", theme.textcolor);
-          }
-        } catch (ex) {
-          console.log(ex);
+        // Use default color values
+        var accentcolor = theme.accentcolor;
+        var textcolor = theme.textcolor;
+
+        if (location.search) {  // Use URL parameter as color values
+          accentcolor = decodeURIComponent(location.search.match(/accentcolor\=[^\&]+/)).
+                        toString().replace(/accentcolor\=/, "");
+          textcolor = decodeURIComponent(location.search.match(/textcolor\=[^\&]+/)).
+                      toString().replace(/textcolor\=/, "");
         }
+
+        else {  // Use saved colors in DOM storage as color values
+          try {
+            var colors;
+            if (localStorage.getItem("colors")) {  // Get old storage from previous version
+              colors = JSON.parse(localStorage.getItem("colors"));
+              accentcolor = colors.accent;
+              textcolor = colors.text;
+              localStorage.removeItem("colors");   // Remove old storage
+            }
+            else if (localStorage.getItem("lwtheme")) {
+              colors = JSON.parse(localStorage.getItem("lwtheme"));
+              accentcolor = colors.accentcolor;
+              textcolor = colors.textcolor;
+            }
+          } catch (ex) {
+          }
+        }
+
+        setColor("accentcolor", accentcolor);
+        setColor("textcolor", textcolor);
+
         preview();
         window.addEventListener("focus", preview, false);
       }
 
       function unload() {
-        try {
-          var lwtheme = {
-            accentcolor: getColor("accentcolor"),
-            textcolor: getColor("textcolor")
+        if (!location.search) {
+          try {
+            var lwtheme = {
+              accentcolor: getColor("accentcolor"),
+              textcolor: getColor("textcolor")
+            }
+            // Save color values to localStorage
+            localStorage.setItem("lwtheme", JSON.stringify(lwtheme));
+          } catch (ex) {
+            console.log(ex);
           }
-          // Save color values to localStorage
-          localStorage.setItem("lwtheme", JSON.stringify(lwtheme));
-        } catch (ex) {
-          console.log(ex);
         }
         window.removeEventListener("focus", preview, false);
       }
@@ -240,7 +261,7 @@
 
           <button onclick="setTheme(INSTALL);">Install Theme</button>
         </div>
-        <script type="text/javascript" src="jscolor/jscolor.js"></script>
+        <script type="text/javascript" src="jscolor/jscolor.min.js"></script>
         <div class="clear"></div>
         <div class="link">
           <a href="#about" title="About Solid Color Theme"
