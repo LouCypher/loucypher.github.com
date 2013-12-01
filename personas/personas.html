@@ -85,7 +85,7 @@
     </style>
 
     <script type="text/javascript">
-      var themeURL = location.href.replace(location.search, "");
+      var themeURL = "http://loucypher.github.io/personas/";
       var theme = {
         id: "solid-color@loucypher",
         name: "Solid Color: #0099B9/#FFFFFF",
@@ -134,7 +134,8 @@
           theme.id = "solid-color-" + accentcolor.toLowerCase() + "-" + textcolor.toLowerCase()
                    + "@loucypher";
           theme.name = "Solid Color: " + toUpperCase(accentcolor) + "/" + toUpperCase(textcolor);
-          theme.homepageURL += "?accentcolor=" + esc(accentcolor) + "&textcolor=" + esc(textcolor);
+          theme.homepageURL = themeURL + "?accentcolor=" + esc(accentcolor) +
+                                         "&textcolor=" + esc(textcolor);
           theme.detailURL = theme.homepageURL;
         }
 
